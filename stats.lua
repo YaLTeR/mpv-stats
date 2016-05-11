@@ -13,8 +13,9 @@ local options = require 'mp.options'
 
 -- Options
 local o = {
+    enabled = false,
     ass_formatting = true,
-    duration = 3,
+    duration = 0.25,
     debug = false,
 
     -- Text style
@@ -49,8 +50,7 @@ local o = {
 }
 options.read_options(o)
 
-
-function main()
+function display_stats()
     local stats = {
         header = "",
         file = "",
@@ -80,6 +80,11 @@ function main()
     mp.osd_message(join_stats(stats), o.duration)
 end
 
+local timer = mp.add_periodic_timer(o.duration - 0.05, function()
+    if o.enabled then
+        display_stats()
+    end
+end)
 
 function add_file(s)
     local sec = "file"
@@ -280,4 +285,6 @@ function b(t)
     return o.b1 .. t .. o.b0
 end
 
-mp.add_key_binding("i", mp.get_script_name(), main, {repeatable=true})
+mp.add_key_binding("i", mp.get_script_name(), function()
+    o.enabled = not o.enabled
+end, {repeatable=true})
